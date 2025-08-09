@@ -95,9 +95,12 @@ class PainOrchestrator:
         """
         Complete pain assessment pipeline using agent architecture for both visits.
         """
+        import time
+        
         pipeline_result = {
             "pipeline": "dual_visit_pain_assessment",
             "orchestrator": self.name,
+            "timestamp": int(time.time()),
             "steps": {},
             "final_result": {}
         }
@@ -109,7 +112,8 @@ class PainOrchestrator:
             # Step 1: ASR Agent for each visit
             asr_request = {
                 "audio_path": audio_path,
-                "language": language
+                "language": language,
+                "visit_type": visit_name
             }
             
             asr_result = self.call_agent("asr_agent.py", asr_request)
@@ -129,7 +133,6 @@ class PainOrchestrator:
             }
         
         # Step 2: TTS Agent - Generate combined assessment text
-        combined_transcript = f"First visit: {visits_data['first_visit']['transcript']} | Second visit: {visits_data['second_visit']['transcript']}"
         tts_text = f"Pain assessment comparison between first and second visit."
         
         tts_request = {
@@ -203,7 +206,7 @@ class PainOrchestrator:
             }
             return pipeline_result
         
-        # Final result
+        # Final result - structured for component compatibility
         pipeline_result["final_result"] = {
             "success": True,
             "pipeline_type": "dual_visit_pain_assessment",
@@ -226,6 +229,191 @@ class PainOrchestrator:
                 "first_visit_severity": pain_assessments["first_visit"].get("severity", "unknown"),
                 "second_visit_severity": pain_assessments["second_visit"].get("severity", "unknown")
             },
+            # Component-compatible structures for frontend integration matching TypeScript interfaces
+            "components": [
+                {
+                    "component": "pain-assessment",
+                    "params": {
+                        "conversationId": 1,
+                        "patientName": "Patient",
+                        "timestamp": pipeline_result.get("timestamp"),
+                        "id": "first_visit_pain_assessment"
+                    }
+                },
+                {
+                    "component": "pain-assessment", 
+                    "params": {
+                        "conversationId": 2,
+                        "patientName": "Patient",
+                        "timestamp": pipeline_result.get("timestamp"),
+                        "id": "second_visit_pain_assessment"
+                    }
+                },
+                {
+                    "component": "assessment",
+                    "params": {
+                        "patientName": "Patient",
+                        "chiefComplaint": "sharp pain on left arm, upper part on the front",
+                        "onsetDetails": {
+                            "timeframe": "about a week ago",
+                            "precipitatingEvent": "fell on back",
+                            "delayedOnset": "pain started a day later"
+                        },
+                        "painCharacteristics": {
+                            "quality": ["sharp", "stabbing", "dull"],
+                            "pattern": "intermittent",
+                            "location": "left arm, upper front"
+                        },
+                        "associatedSymptoms": ["shortness of breath"],
+                        "aggravatingFactors": ["lying down", "turning head left"],
+                        "alleviatingFactors": ["extra strength Tylenol"],
+                        "workingDiagnosis": ["pinched nerve", "cervical radiculopathy"],
+                        "timestamp": pipeline_result.get("timestamp"),
+                        "id": "clinical_assessment"
+                    }
+                },
+                {
+                    "component": "physical-examination",
+                    "params": {
+                        "examinerName": "Doctor",
+                        "examinationType": "neurological assessment",
+                        "rangeOfMotion": {
+                            "armRaise": "normal",
+                            "headTurning": {
+                                "left": "painful",
+                                "right": "normal"
+                            }
+                        },
+                        "neurologicalFindings": {
+                            "reflexes": "symmetric",
+                            "strength": {
+                                "biceps": "normal",
+                                "triceps": "normal",
+                                "shoulder": "normal",
+                                "handGrip": "normal",
+                                "fingerStrength": "normal"
+                            },
+                            "sensation": "intact and symmetric bilaterally"
+                        },
+                        "additionalFindings": [
+                            "No weakness detected",
+                            "Pain increases when lying down",
+                            "Sharp stabbing pain pattern"
+                        ],
+                        "timestamp": pipeline_result.get("timestamp"),
+                        "id": "physical_examination"
+                    }
+                },
+                {
+                    "component": "treatment-plan",
+                    "params": {
+                        "prescribedMedications": [
+                            {
+                                "name": "Ibuprofen",
+                                "dosage": "high-dose",
+                                "frequency": "twice daily",
+                                "duration": "1 week",
+                                "instructions": "Take with food to prevent stomach upset"
+                            }
+                        ],
+                        "procedures": [
+                            {
+                                "name": "EMG and Nerve Conduction Study",
+                                "description": "Electromyography and nerve conduction velocity testing to assess nerve function",
+                                "completed": False
+                            }
+                        ],
+                        "followUpInstructions": [
+                            "Return in 1 week to assess medication effectiveness",
+                            "Complete EMG testing as scheduled",
+                            "Report any worsening symptoms immediately"
+                        ],
+                        "nextSteps": [
+                            "EMG and nerve conduction testing",
+                            "Follow-up appointment in 2 weeks",
+                            "Consider MRI if EMG shows abnormalities"
+                        ],
+                        "timestamp": pipeline_result.get("timestamp"),
+                        "id": "treatment_plan"
+                    }
+                },
+                {
+                    "component": "follow-up-assessment",
+                    "params": {
+                        "visitType": "follow-up",
+                        "daysSinceLastVisit": 30,
+                        "patientName": "Patient",
+                        "previousTreatment": {
+                            "medications": ["ibuprofen", "Tylenol"],
+                            "effectiveness": "partially-effective" if pain_assessments["second_visit"].get("pain_nrs", 0) < pain_assessments["first_visit"].get("pain_nrs", 0) else "ineffective",
+                            "ongoingSymptoms": ["pain when lying down", "intermittent sharp pain"]
+                        },
+                        "clinicalDecision": {
+                            "nextStep": "EMG and nerve conduction testing",
+                            "reasoning": "Persistent symptoms despite treatment, suspected nerve involvement",
+                            "workingDiagnosis": ["pinched nerve", "cervical radiculopathy"]
+                        },
+                        "timestamp": pipeline_result.get("timestamp"),
+                        "id": "follow_up_assessment"
+                    }
+                },
+                {
+                    "component": "emg-test",
+                    "params": {
+                        "testName": "EMG and Nerve Conduction Study",
+                        "testType": "Combined",
+                        "procedureSteps": [
+                            {
+                                "step": "nerve_conduction",
+                                "description": "Put electric current and follow it from nerve to spinal cord and back",
+                                "discomfortLevel": "mild"
+                            },
+                            {
+                                "step": "emg_needle",
+                                "description": "Insert needle into muscle spots to measure signals",
+                                "discomfortLevel": "moderate"
+                            }
+                        ],
+                        "clinicalIndication": "Suspected pinched nerve causing persistent arm pain",
+                        "expectedFindings": [
+                            "nerve conduction abnormalities",
+                            "muscle denervation signs"
+                        ],
+                        "patientConcerns": [
+                            "medication interactions",
+                            "procedure discomfort"
+                        ],
+                        "timestamp": pipeline_result.get("timestamp"),
+                        "id": "emg_test_assessment"
+                    }
+                },
+                {
+                    "component": "medication-interaction",
+                    "params": {
+                        "currentMedications": [
+                            {
+                                "name": "Prozac",
+                                "purpose": "depression/anxiety treatment"
+                            }
+                        ],
+                        "proposedProcedure": "EMG with needle insertion",
+                        "interactions": [
+                            {
+                                "medication": "Prozac",
+                                "interaction": "none",
+                                "explanation": "No interaction with EMG procedure. Only concern would be blood thinners."
+                            }
+                        ],
+                        "recommendations": [
+                            "Procedure safe to continue",
+                            "No medication adjustments needed",
+                            "Avoid blood thinners before procedure"
+                        ],
+                        "timestamp": pipeline_result.get("timestamp"),
+                        "id": "medication_interaction_check"
+                    }
+                }
+            ],
             "tts_output": tts_result,
             "security_status": security_result.get("overall_status", {}),
             "security_test_results": test_security_result,

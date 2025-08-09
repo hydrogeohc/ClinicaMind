@@ -35,11 +35,16 @@ class ASRAgent:
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """
         Process ASR request and return JSON response.
-        Expected input: {"audio_path": "path/to/file", "language": "en-US"}
+        Expected input: {
+            "audio_path": "path/to/file", 
+            "language": "en-US",
+            "visit_type": "first_visit" | "second_visit" (optional)
+        }
         """
         try:
             audio_path = request.get("audio_path")
             language = request.get("language", "en-US")
+            visit_type = request.get("visit_type")
             
             if not audio_path:
                 return {
@@ -50,13 +55,28 @@ class ASRAgent:
             
             transcript = transcribe_openai_whisper(audio_path, language)
             
-            return {
+            # Base response structure
+            response = {
                 "success": True,
                 "agent": self.name,
                 "transcript": transcript,
                 "audio_path": audio_path,
                 "language": language
             }
+            
+            # Add visit type information if provided
+            if visit_type in ["first_visit", "second_visit"]:
+                response["visit_type"] = visit_type
+                
+                # Add metadata based on visit type for better integration with components
+                response["metadata"] = {
+                    "conversation_id": 1 if visit_type == "first_visit" else 2,
+                    "visit_sequence": visit_type,
+                    "timestamp": request.get("timestamp"),
+                    "id": request.get("id", f"{visit_type}_{hash(audio_path) % 10000}")
+                }
+            
+            return response
             
         except Exception as e:
             return {
@@ -70,6 +90,8 @@ def main():
     parser.add_argument("--input", "-i", help="JSON input string or file path")
     parser.add_argument("--audio", help="Audio file path (direct mode)")
     parser.add_argument("--language", default="en-US", help="Language code")
+    parser.add_argument("--visit-type", choices=["first_visit", "second_visit"], 
+                       help="Visit type for medical context")
     args = parser.parse_args()
     
     agent = ASRAgent()
@@ -79,6 +101,8 @@ def main():
             "audio_path": args.audio,
             "language": args.language
         }
+        if args.visit_type:
+            request["visit_type"] = args.visit_type
     elif args.input:
         if args.input.startswith('{'):
             request = json.loads(args.input)
