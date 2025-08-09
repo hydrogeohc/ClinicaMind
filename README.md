@@ -1,1 +1,1 @@
-# ClinicMinds
+# ClinicaMind
