@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
@@ -696,27 +697,48 @@ export default function Demo() {
               {components.length > 0 ? (
                 <DynamicComponentRenderer components={components} />
               ) : (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Clinical Notes & Assessment</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="text-center py-12">
-                      <p className="text-lg font-medium mb-2">
-                        {currentConversation === 1 ? "David S - First Visit" : "David S - Follow-up Visit (30 days)"}
-                      </p>
-                      <p className="text-muted-foreground mb-4">
-                        Press <kbd className="px-2 py-1 bg-muted rounded text-xs">Space</kbd> to start the conversation demo
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {currentConversation === 1 
-                          ? "Initial consultation for left upper arm pain following a fall"
-                          : "Follow-up visit after 30 days of treatment - EMG testing ordered"
-                        }
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                >
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Clinical Notes & Assessment</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="text-center py-12">
+                        <motion.p 
+                          className="text-lg font-medium mb-2"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.2 }}
+                        >
+                          {currentConversation === 1 ? "David S - First Visit" : "David S - Follow-up Visit (30 days)"}
+                        </motion.p>
+                        <motion.p 
+                          className="text-muted-foreground mb-4"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.3 }}
+                        >
+                          Press <kbd className="px-2 py-1 bg-muted rounded text-xs">Space</kbd> to start the conversation demo
+                        </motion.p>
+                        <motion.p 
+                          className="text-sm text-muted-foreground"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.4 }}
+                        >
+                          {currentConversation === 1 
+                            ? "Initial consultation for left upper arm pain following a fall"
+                            : "Follow-up visit after 30 days of treatment - EMG testing ordered"
+                          }
+                        </motion.p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               )}
             </div>
           </ScrollArea>

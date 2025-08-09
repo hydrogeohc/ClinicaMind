@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   PhysicalExaminationComponent,
   AssessmentComponent,
@@ -93,8 +94,51 @@ export function DynamicComponentRenderer({ components }: ComponentRendererProps)
   };
 
   return (
-    <div className="space-y-6">
-      {components.slice().reverse().map((component, index) => renderComponent(component, components.length - 1 - index))}
-    </div>
+    <AnimatePresence initial={false}>
+      <motion.div 
+        layout
+        className="space-y-6"
+      >
+        {components.slice().reverse().map((component, index) => {
+          const key = `${component.component}-${component.params.id || index}`;
+          return (
+            <motion.div
+              key={key}
+              layout
+              initial={{ 
+                opacity: 0, 
+                y: -50,
+                scale: 0.95
+              }}
+              animate={{ 
+                opacity: 1, 
+                y: 0,
+                scale: 1
+              }}
+              exit={{ 
+                opacity: 0, 
+                y: -20,
+                scale: 0.95
+              }}
+              whileHover={{ 
+                y: -2,
+                transition: { duration: 0.2 }
+              }}
+              transition={{ 
+                duration: 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94],
+                layout: { 
+                  duration: 0.4,
+                  ease: [0.25, 0.46, 0.45, 0.94]
+                },
+                delay: index * 0.05 // Subtle stagger effect
+              }}
+            >
+              {renderComponent(component, components.length - 1 - index)}
+            </motion.div>
+          );
+        })}
+      </motion.div>
+    </AnimatePresence>
   );
 }
