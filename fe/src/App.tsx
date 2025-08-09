@@ -17,23 +17,166 @@ export default function Demo() {
     audioFile: "/first visit.m4a",
     components: [
       {
-        delay: 2000, // 2 seconds
+        delay: 1000, // 1 second - greeting
         component: {
           component: "generic-info",
           params: {
-            id: "session-start",
-            title: "Consultation Started - David S",
-            content: "First visit consultation initiated. Patient presenting with chief complaint of arm pain.",
+            id: "greeting",
+            title: "Patient Greeting",
+            content: "David S: 'Hi doctor, how are you?'",
             type: "info"
           }
         }
       },
       {
-        delay: 3000, // 3 seconds after previous
+        delay: 8000, // 8 seconds - chief complaint [00:01-00:08]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "chief-complaint",
+            title: "Chief Complaint",
+            content: "David S reports: 'I'm having very sharp pain on my left arm, the upper part on the front.'",
+            type: "warning"
+          }
+        }
+      },
+      {
+        delay: 9000, // 9 seconds - onset timing [00:08-00:17]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "onset-details",
+            title: "Pain Onset Details",
+            content: "Started about a week ago. Patient fell on his back but didn't hit his arm. Pain started the day after the fall.",
+            type: "info"
+          }
+        }
+      },
+      {
+        delay: 5000, // 5 seconds - pain pattern [00:18-00:23]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "pain-pattern",
+            title: "Pain Pattern",
+            content: "Dr. Sha asks about pain pattern. David S: 'It comes and goes.'",
+            type: "info"
+          }
+        }
+      },
+      {
+        delay: 12000, // 12 seconds - pain quality [00:23-00:35]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "pain-quality",
+            title: "Pain Description",
+            content: "David S describes pain as 'Dull and sometimes stabbing. It kind of varies between those two.'",
+            type: "info"
+          }
+        }
+      },
+      {
+        delay: 14000, // 14 seconds - associated symptoms [00:36-00:49]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "associated-symptoms",
+            title: "Associated Symptoms",
+            content: "David S reports: 'I've had shortness of breath sometimes I've noticed.' Occurs some of the time, not every time.",
+            type: "warning"
+          }
+        }
+      },
+      {
+        delay: 14000, // 14 seconds - pain relief [00:50-01:04]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "current-treatment",
+            title: "Current Self-Treatment",
+            content: "David S: 'Sometimes I'll take like extra strength Tylenol and it kind of helps, but I haven't been given any pain medications yet.'",
+            type: "success"
+          }
+        }
+      },
+      {
+        delay: 12000, // 12 seconds - aggravating factors [01:05-01:17]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "aggravating-factors",
+            title: "Aggravating Factors",
+            content: "Dr. Sha asks about triggers. David S: 'When I'm laying down. It makes it worse, yeah.'",
+            type: "warning"
+          }
+        }
+      },
+      {
+        delay: 17000, // 17 seconds - physical examination starts [01:18-01:35]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "physical-exam-start",
+            title: "Physical Examination Started",
+            content: "Dr. Sha begins examination: 'Raise your arm up' → Normal. 'Turn your head to the right' → Normal. 'Turn to the left' → Patient reports pain.",
+            type: "info"
+          }
+        }
+      },
+      {
+        delay: 18000, // 18 seconds - neurological examination [01:36-01:54]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "neuro-exam",
+            title: "Neurological Examination",
+            content: "Dr. Sha: 'Any weakness?' David S: 'No, no weakness at all.' Reflexes symmetric, strength normal in all muscle groups, sensation intact bilaterally.",
+            type: "success"
+          }
+        }
+      },
+      {
+        delay: 3000, // 3 seconds - treatment transition [01:54-01:57]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "treatment-transition",
+            title: "Treatment Discussion",
+            content: "Dr. Sha: 'Now, let's talk treatment plan and diagnosis.'",
+            type: "info"
+          }
+        }
+      },
+      {
+        delay: 10000, // 10 seconds - medication prescription [01:58-02:07]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "medication-prescribed",
+            title: "Medication Prescribed",
+            content: "Dr. Sha prescribes: 'Here's some high-dose ibuprofen. Let's try that for the next week, twice a day, see if you feel...'",
+            type: "success"
+          }
+        }
+      },
+      {
+        delay: 5000, // 5 seconds - summary components
+        component: {
+          component: "pain-assessment",
+          params: {
+            id: "pain-diagram-summary",
+            conversationId: 1,
+            patientName: "David S"
+          }
+        }
+      },
+      {
+        delay: 3000, // 3 seconds after pain diagram
         component: {
           component: "assessment",
           params: {
-            id: "clinical-assessment",
+            id: "clinical-assessment-summary",
             patientName: "David S",
             chiefComplaint: "Sharp pain in left upper arm (front/upper part)",
             onsetDetails: {
@@ -53,22 +196,11 @@ export default function Demo() {
         }
       },
       {
-        delay: 4000, // 4 seconds after previous
-        component: {
-          component: "pain-assessment",
-          params: {
-            id: "pain-diagram",
-            conversationId: 1,
-            patientName: "David S"
-          }
-        }
-      },
-      {
-        delay: 3500, // 3.5 seconds after previous
+        delay: 3000, // 3 seconds after assessment
         component: {
           component: "physical-examination",
           params: {
-            id: "physical-exam",
+            id: "physical-exam-summary",
             examinerName: "Dr. Sha",
             examinationType: "Focused Musculoskeletal and Neurological Examination",
             rangeOfMotion: {
@@ -98,11 +230,11 @@ export default function Demo() {
         }
       },
       {
-        delay: 4000, // 4 seconds after previous
+        delay: 3000, // 3 seconds after physical exam
         component: {
           component: "treatment-plan",
           params: {
-            id: "treatment-plan",
+            id: "treatment-plan-summary",
             prescribedMedications: [
               {
                 name: "High-dose Ibuprofen",
@@ -139,44 +271,164 @@ export default function Demo() {
     audioFile: "/second visit.m4a",
     components: [
       {
-        delay: 2000, // 2 seconds
+        delay: 8000, // 8 seconds - follow-up status [00:00-00:08]
         component: {
-          component: "follow-up-assessment",
+          component: "generic-info",
           params: {
-            id: "follow-up-assessment",
-            visitType: "follow-up",
-            daysSinceLastVisit: 30,
-            patientName: "David S",
-            previousTreatment: {
-              medications: ["Extra strength Tylenol (self-administered)", "High-dose Ibuprofen (prescribed)"],
-              effectiveness: "ineffective",
-              ongoingSymptoms: ["Pain when laying down", "Pain when turning head left", "Continued arm pain"]
-            },
-            clinicalDecision: {
-              nextStep: "EMG and Nerve Conduction Velocity Testing",
-              reasoning: "Pain persists despite treatment for 30 days. Suspect pinched nerves requiring diagnostic confirmation.",
-              workingDiagnosis: ["Pinched nerve", "Cervical radiculopathy", "Nerve compression syndrome"]
-            }
+            id: "follow-up-status",
+            title: "30-Day Follow-up",
+            content: "Dr. Sha: 'So now it's been a month and you're still feeling the pain. I think we should take a closer look to see what may be causing it.'",
+            type: "warning"
           }
         }
       },
       {
-        delay: 3000, // 3 seconds after previous
+        delay: 12000, // 12 seconds - patient treatment report [00:08-00:20]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "treatment-report",
+            title: "Treatment Response",
+            content: "David S: 'I was taking the Tylenol or the ibuprofen that you've prescribed. I'm still getting the pain when I lay down and I'm not sure what's going on with me. I'm starting to get worried.'",
+            type: "warning"
+          }
+        }
+      },
+      {
+        delay: 10000, // 10 seconds - doctor's plan [00:21-00:31]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "clinical-decision",
+            title: "Clinical Decision",
+            content: "Dr. Sha: 'No weakness. So we'll take a closer look and seeing what's going on as far as what maybe causing the symptoms. I suspect it to be pinched nerves, but we'll take a look.'",
+            type: "info"
+          }
+        }
+      },
+      {
+        delay: 17000, // 17 seconds - EMG introduction [00:32-00:48]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "emg-introduction",
+            title: "Diagnostic Test Ordered",
+            content: "Patient asks: 'What is this test?' Dr. Sha: 'It's called an EMG. It's a electromyography and nerve conduction velocity testing. Looks to see if the nerves are getting pinched, what spot maybe they're getting pinched or hurt or injured.'",
+            type: "info"
+          }
+        }
+      },
+      {
+        delay: 9000, // 9 seconds - patient understanding [00:49-00:58]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "patient-understanding",
+            title: "Patient Understanding",
+            content: "David S: 'Oh, that's interesting. I can see it here on the tablet. So this is basically what my it's going to measure the nerve activity.'",
+            type: "success"
+          }
+        }
+      },
+      {
+        delay: 17000, // 17 seconds - first test explanation [00:58-01:15]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "ncs-explanation",
+            title: "Nerve Conduction Study",
+            content: "Dr. Sha: 'We're going to start the first half of the test involves us putting a little electric current and following the current from the nerve all the way to the spinal cord and back. And that measuring of that will tell us what may or may not be going on with the nerves.'",
+            type: "info"
+          }
+        }
+      },
+      {
+        delay: 7000, // 7 seconds - pain concern [01:13-01:22]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "pain-concern",
+            title: "Pain Tolerance Discussion",
+            content: "David S: 'Is it going to hurt?' Dr. Sha: 'It's a little uncomfortable. It's honestly like very quick such as a rubber band being snapped against the skin.' David S: 'Okay, I can handle that.'",
+            type: "warning"
+          }
+        }
+      },
+      {
+        delay: 16000, // 16 seconds - EMG needle explanation [01:23-01:39]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "emg-needle-explanation",
+            title: "EMG Needle Procedure",
+            content: "Dr. Sha: 'Second half of the test, I'll insert a needle almost like acupuncture into a few spots in the muscles to measure the signal and that will give us an idea of what may be going on with the nerves that address those muscles.'",
+            type: "info"
+          }
+        }
+      },
+      {
+        delay: 14000, // 14 seconds - medication interaction [01:40-01:54]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "medication-interaction-check",
+            title: "Medication Safety Check",
+            content: "David S: 'I am on some medication, Prozac. Does that affect any of this?' Dr. Sha: 'No, it's totally fine. The only thing we worry about is if you were on blood thinners, sometimes you can get a little excess bleeding from the needle insertion.'",
+            type: "success"
+          }
+        }
+      },
+      {
+        delay: 5000, // 5 seconds - safety confirmation [01:55-02:00]
+        component: {
+          component: "generic-info",
+          params: {
+            id: "safety-confirmation",
+            title: "Safety Confirmed",
+            content: "David S: 'I'm not taking any aspirin or anything like that.' Dr. Sha: 'Great. Perfect. Then you should be fine.'",
+            type: "success"
+          }
+        }
+      },
+      {
+        delay: 5000, // 5 seconds - summary components start
         component: {
           component: "pain-assessment",
           params: {
-            id: "persistent-pain-diagram",
+            id: "persistent-pain-diagram-summary",
             conversationId: 2,
             patientName: "David S"
           }
         }
       },
       {
-        delay: 4000, // 4 seconds after previous
+        delay: 3000, // 3 seconds after pain diagram
+        component: {
+          component: "follow-up-assessment",
+          params: {
+            id: "follow-up-assessment-summary",
+            visitType: "follow-up",
+            daysSinceLastVisit: 30,
+            patientName: "David S",
+            previousTreatment: {
+              medications: ["Extra strength Tylenol (self-administered)", "High-dose Ibuprofen (prescribed)"],
+              effectiveness: "ineffective",
+              ongoingSymptoms: ["Pain when laying down", "Pain when turning head left", "Continued arm pain", "Patient getting worried"]
+            },
+            clinicalDecision: {
+              nextStep: "EMG and Nerve Conduction Velocity Testing",
+              reasoning: "Pain persists despite treatment for 30 days. No weakness observed. Suspect pinched nerves requiring diagnostic confirmation.",
+              workingDiagnosis: ["Pinched nerve", "Cervical radiculopathy", "Nerve compression syndrome"]
+            }
+          }
+        }
+      },
+      {
+        delay: 3000, // 3 seconds after follow-up assessment
         component: {
           component: "medication-interaction",
           params: {
-            id: "medication-safety-check",
+            id: "medication-safety-check-summary",
             currentMedications: [
               {
                 name: "Prozac",
@@ -200,11 +452,11 @@ export default function Demo() {
         }
       },
       {
-        delay: 4500, // 4.5 seconds after previous
+        delay: 3000, // 3 seconds after medication interaction
         component: {
           component: "emg-test",
           params: {
-            id: "emg-nerve-testing",
+            id: "emg-nerve-testing-summary",
             testName: "EMG & Nerve Conduction Velocity Testing",
             testType: "Combined",
             clinicalIndication: "Evaluate for pinched nerves causing persistent left upper arm pain after conservative treatment failure",

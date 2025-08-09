@@ -5,7 +5,7 @@ import { Activity, Zap, Syringe, AlertCircle } from "lucide-react";
 import { EMGTestComponentProps } from "~/types/components";
 import { cn } from "~/lib/utils";
 
-export function EMGTestComponent({ 
+export function EMGTestComponent({
   testName,
   testType,
   procedureSteps,
@@ -84,7 +84,7 @@ export function EMGTestComponent({
                   <h5 className="font-medium mb-1">{step.step}</h5>
                   <p className="text-sm text-muted-foreground mb-2">{step.description}</p>
                   {step.discomfortLevel && (
-                    <Badge 
+                    <Badge
                       className={cn("text-xs", getDiscomfortColor(step.discomfortLevel))}
                       variant="outline"
                     >
@@ -132,15 +132,6 @@ export function EMGTestComponent({
             </div>
           </>
         )}
-
-        {/* Test Visualization */}
-        <div className="p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg border">
-          <div className="text-center">
-            <Activity className="h-12 w-12 text-slate-600 mx-auto mb-2" />
-            <p className="text-sm text-slate-600 font-medium">Nerve Signal Monitoring</p>
-            <p className="text-xs text-slate-500 mt-1">Real-time electrical activity measurement</p>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
