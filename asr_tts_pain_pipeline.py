@@ -2,25 +2,51 @@
 import argparse, json, os, re, sys, tempfile, numpy as np
 
 # ==== ASR backends ====
-def transcribe_whisper(audio_path: str, model_name: str = "small", language: str = "en") -> str:
+def transcribe_google_cloud(audio_path: str, language: str = "en-US") -> str:
     """
-    Try faster-whisper first; if unavailable, fall back to openai-whisper.
+    Transcribe audio using Google Cloud Speech-to-Text API.
+    Provides superior accuracy and performance compared to Whisper.
     """
+    from google.cloud import speech
+    
+    client = speech.SpeechClient()
+    
+    with open(audio_path, "rb") as audio_file:
+        content = audio_file.read()
+    
+    audio = speech.RecognitionAudio(content=content)
+    
+    config = speech.RecognitionConfig(
+        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+        sample_rate_hertz=16000,
+        language_code=language,
+        enable_automatic_punctuation=True,
+        enable_word_time_offsets=False,
+        model="latest_long",
+        use_enhanced=True,
+    )
+    
     try:
-        from faster_whisper import WhisperModel
-        model = WhisperModel(model_name, device="auto", compute_type="auto")
-        segments, info = model.transcribe(audio_path, language=language, beam_size=5, vad_filter=True)
-        transcript = " ".join(seg.text.strip() for seg in segments)
-        return transcript.strip()
-    except Exception as e_fast:
-        print(f"[faster-whisper] failed ({e_fast}). Falling back to openai/whisper...", file=sys.stderr)
+        response = client.recognize(config=config, audio=audio)
+        
+        transcript_parts = []
+        for result in response.results:
+            transcript_parts.append(result.alternatives[0].transcript)
+        
+        return " ".join(transcript_parts).strip()
+    
+    except Exception as e:
+        print(f"[Google Cloud Speech] Recognition failed: {e}", file=sys.stderr)
+        
+        config.encoding = speech.RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED
         try:
-            import whisper
-            model = whisper.load_model(model_name)
-            result = model.transcribe(audio_path, language=language)
-            return result["text"].strip()
-        except Exception as e_open:
-            raise RuntimeError(f"Both faster-whisper and openai-whisper failed: {e_open}") from e_open
+            response = client.recognize(config=config, audio=audio)
+            transcript_parts = []
+            for result in response.results:
+                transcript_parts.append(result.alternatives[0].transcript)
+            return " ".join(transcript_parts).strip()
+        except Exception as e2:
+            raise RuntimeError(f"Google Cloud Speech recognition failed: {e2}") from e2
 
 # ==== Pain NLP extractor ====
 WORD2NUM = {"zero":0,"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9,"ten":10}
@@ -70,34 +96,111 @@ def estimate_pain_from_text(text: str):
     return est, bucketize(est)
 
 # ==== TTS backends ====
-def tts_coqui(text: str, out_wav: str, model_id: str = "tts_models/en/ljspeech/tacotron2-DDC"):
-    # Coqui TTS (higher quality; needs first-time download)
-    from TTS.api import TTS
-    tts = TTS(model_id)
-    tts.tts_to_file(text=text, file_path=out_wav)
+def tts_google_cloud(text: str, out_wav: str, language_code: str = "en-US", voice_name: str = "en-US-Neural2-F"):
+    """
+    Generate speech using Google Cloud Text-to-Speech API.
+    Provides superior quality and natural-sounding voices.
+    """
+    from google.cloud import texttospeech
+    
+    client = texttospeech.TextToSpeechClient()
+    
+    synthesis_input = texttospeech.SynthesisInput(text=text)
+    
+    voice = texttospeech.VoiceSelectionParams(
+        language_code=language_code,
+        name=voice_name,
+    )
+    
+    audio_config = texttospeech.AudioConfig(
+        audio_encoding=texttospeech.AudioEncoding.LINEAR16,
+        sample_rate_hertz=24000,
+        speaking_rate=1.0,
+        pitch=0.0,
+    )
+    
+    try:
+        response = client.synthesize_speech(
+            input=synthesis_input, 
+            voice=voice, 
+            audio_config=audio_config
+        )
+        
+        with open(out_wav, "wb") as out:
+            out.write(response.audio_content)
+            
+    except Exception as e:
+        raise RuntimeError(f"Google Cloud Text-to-Speech failed: {e}") from e
 
-def tts_pyttsx3(text: str):
-    # pyttsx3 is lightweight and fully offline
-    import pyttsx3
-    engine = pyttsx3.init()
-    engine.say(text)
-    engine.runAndWait()
+def tts_google_cloud_speak(text: str):
+    """
+    Play synthesized speech directly without saving to file.
+    """
+    import tempfile
+    import os
+    try:
+        import soundfile as sf
+        import numpy as np
+        from io import BytesIO
+    except ImportError:
+        print("[TTS] soundfile not available for direct playback. Use file output instead.", file=sys.stderr)
+        return
+    
+    from google.cloud import texttospeech
+    
+    client = texttospeech.TextToSpeechClient()
+    
+    synthesis_input = texttospeech.SynthesisInput(text=text)
+    voice = texttospeech.VoiceSelectionParams(
+        language_code="en-US",
+        name="en-US-Neural2-F",
+    )
+    audio_config = texttospeech.AudioConfig(
+        audio_encoding=texttospeech.AudioEncoding.LINEAR16,
+        sample_rate_hertz=24000,
+    )
+    
+    try:
+        response = client.synthesize_speech(
+            input=synthesis_input, 
+            voice=voice, 
+            audio_config=audio_config
+        )
+        
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_file:
+            tmp_file.write(response.audio_content)
+            tmp_path = tmp_file.name
+        
+        try:
+            import pygame
+            pygame.mixer.init()
+            pygame.mixer.music.load(tmp_path)
+            pygame.mixer.music.play()
+            while pygame.mixer.music.get_busy():
+                pygame.time.wait(100)
+        except ImportError:
+            print(f"[TTS] Audio saved to {tmp_path}. Install pygame for direct playback.", file=sys.stderr)
+        finally:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+                
+    except Exception as e:
+        raise RuntimeError(f"Google Cloud Text-to-Speech playback failed: {e}") from e
 
 def main():
     import argparse
-    p = argparse.ArgumentParser(description="ASR→NLP→TTS pipeline for estimating arm pain NRS from audio.")
+    p = argparse.ArgumentParser(description="ASR→NLP→TTS pipeline for estimating arm pain NRS from audio using Google Cloud.")
     p.add_argument("--audio", required=True, help="Path to WAV/MP3")
-    p.add_argument("--whisper-model", default="small", help="Whisper size: tiny, base, small, medium, large-v3")
-    p.add_argument("--language", default="en", help="Spoken language code (e.g., en)")
-    p.add_argument("--tts", choices=["coqui","pyttsx3","none"], default="coqui", help="Text-to-speech backend")
-    p.add_argument("--coqui-model-id", default="tts_models/en/ljspeech/tacotron2-DDC", help="Coqui TTS model id")
+    p.add_argument("--language", default="en-US", help="Language code (e.g., en-US, es-ES)")
+    p.add_argument("--tts", choices=["google_cloud","google_cloud_speak","none"], default="google_cloud", help="Text-to-speech backend")
+    p.add_argument("--voice-name", default="en-US-Neural2-F", help="Google Cloud TTS voice name")
     p.add_argument("--out-json", default="asr_tts_output.json")
     p.add_argument("--out-tts", default="pain_assessment_tts.wav")
     args = p.parse_args()
 
     # ASR
-    print(f"[ASR] Transcribing with Whisper model: {args.whisper_model}")
-    transcript = transcribe_whisper(args.audio, model_name=args.whisper_model, language=args.language)
+    print(f"[ASR] Transcribing with Google Cloud Speech-to-Text")
+    transcript = transcribe_google_cloud(args.audio, language=args.language)
     print(f"[ASR] Transcript: {transcript}")
 
     # NLP pain estimation
@@ -112,13 +215,13 @@ def main():
 
     # TTS
     tts_text = f"The estimated arm pain is {est:.1f} out of ten, which is {bucket}."
-    if args.tts == "coqui":
-        print(f"[TTS] Synthesizing speech with Coqui to {args.out_tts}")
-        tts_coqui(tts_text, args.out_tts, model_id=args.coqui_model_id)
+    if args.tts == "google_cloud":
+        print(f"[TTS] Synthesizing speech with Google Cloud TTS to {args.out_tts}")
+        tts_google_cloud(tts_text, args.out_tts, language_code=args.language, voice_name=args.voice_name)
         print(f"[I/O] Saved {args.out_tts}")
-    elif args.tts == "pyttsx3":
-        print("[TTS] Speaking result via pyttsx3 (no file saved).")
-        tts_pyttsx3(tts_text)
+    elif args.tts == "google_cloud_speak":
+        print("[TTS] Speaking result via Google Cloud TTS (direct playback).")
+        tts_google_cloud_speak(tts_text)
     else:
         print("[TTS] Skipped.")
 

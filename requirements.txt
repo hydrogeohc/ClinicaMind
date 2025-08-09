@@ -1,14 +1,11 @@
 
-# ASR
-faster-whisper>=1.0.0
-openai-whisper>=20231117
+# Google Cloud ASR & TTS
+google-cloud-speech>=2.0.0
+google-cloud-texttospeech>=2.0.0
 # Audio I/O
 soundfile>=0.12.1
 numpy>=1.23.0
 # NLP
 regex>=2024.5.15
-# TTS (choose one or both)
-TTS>=0.22.0
-pyttsx3>=2.90
 # Utilities
 pydub>=0.25.1
