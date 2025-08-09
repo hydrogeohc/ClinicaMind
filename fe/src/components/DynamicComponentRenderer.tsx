@@ -7,7 +7,9 @@ import {
   EMGTestComponent,
   FollowUpAssessmentComponent,
   MedicationInteractionComponent,
-  RecentLabResultsComponent, 
+  RecentLabResultsComponent,
+  ClinicalGuidanceComponent,
+  InsuranceCoverageComponent,
   GenericInfoComponent 
 } from "~/components/medical";
 import { DynamicComponent, ComponentRendererProps } from "~/types/components";
@@ -69,6 +71,20 @@ export function DynamicComponentRenderer({ components }: ComponentRendererProps)
       case "recent-lab-result":
         return (
           <RecentLabResultsComponent 
+            key={key}
+            {...dynamicComponent.params}
+          />
+        );
+      case "clinical-guidance":
+        return (
+          <ClinicalGuidanceComponent 
+            key={key}
+            {...dynamicComponent.params}
+          />
+        );
+      case "insurance-coverage":
+        return (
+          <InsuranceCoverageComponent 
             key={key}
             {...dynamicComponent.params}
           />

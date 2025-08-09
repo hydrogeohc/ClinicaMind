@@ -6,4 +6,6 @@ export { EMGTestComponent } from "./EMGTestComponent";
 export { FollowUpAssessmentComponent } from "./FollowUpAssessmentComponent";
 export { MedicationInteractionComponent } from "./MedicationInteractionComponent";
 export { RecentLabResultsComponent } from "./RecentLabResultsComponent";
+export { ClinicalGuidanceComponent } from "./ClinicalGuidanceComponent";
+export { InsuranceCoverageComponent } from "./InsuranceCoverageComponent";
 export { GenericInfoComponent } from "./GenericInfoComponent";

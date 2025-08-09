@@ -133,6 +133,29 @@ export interface RecentLabResultsComponentProps extends BaseComponentProps {
   date: string;
 }
 
+// Props for clinical guidance component (proactive recommendations)
+export interface ClinicalGuidanceComponentProps extends BaseComponentProps {
+  title: string;
+  guidanceType: "examination" | "questions" | "procedure" | "assessment";
+  recommendations: string[];
+  context?: string;
+  priority?: "high" | "medium" | "low";
+}
+
+// Props for insurance coverage component
+export interface InsuranceCoverageComponentProps extends BaseComponentProps {
+  procedureName: string;
+  icd10Code: string;
+  cptCode: string;
+  coverageStatus: "covered" | "partial" | "not-covered" | "pre-auth-required";
+  patientResponsibility?: string;
+  notes?: string[];
+  estimatedCost?: {
+    total: string;
+    patientPortion: string;
+  };
+}
+
 // Props for generic information component (fallback)
 export interface GenericInfoComponentProps extends BaseComponentProps {
   title: string;
@@ -155,6 +178,8 @@ export type DynamicComponent =
   | { component: "follow-up-assessment"; params: FollowUpAssessmentComponentProps }
   | { component: "medication-interaction"; params: MedicationInteractionComponentProps }
   | { component: "recent-lab-result"; params: RecentLabResultsComponentProps }
+  | { component: "clinical-guidance"; params: ClinicalGuidanceComponentProps }
+  | { component: "insurance-coverage"; params: InsuranceCoverageComponentProps }
   | { component: "generic-info"; params: GenericInfoComponentProps };
 
 // Type for component registry mapping

@@ -30,6 +30,25 @@ export default function Demo() {
         }
       },
       {
+        delay: 3000, // 3 seconds - proactive guidance before chief complaint question
+        component: {
+          component: "clinical-guidance",
+          params: {
+            id: "pre-chief-complaint-guidance",
+            title: "History Taking Guidance",
+            guidanceType: "questions",
+            recommendations: [
+              "Ask about pain location, character, and onset",
+              "Inquire about precipitating events or trauma",
+              "Assess pain pattern: continuous vs intermittent",
+              "Document associated symptoms"
+            ],
+            context: "Patient presents with arm pain - systematic pain assessment recommended",
+            priority: "high"
+          }
+        }
+      },
+      {
         delay: 8000, // 8 seconds - chief complaint [00:01-00:08]
         component: {
           component: "generic-info",
@@ -54,7 +73,25 @@ export default function Demo() {
         }
       },
       {
-        delay: 5000, // 5 seconds - pain pattern [00:18-00:23]
+        delay: 2000, // 2 seconds - guidance before pain pattern question
+        component: {
+          component: "clinical-guidance",
+          params: {
+            id: "pre-pain-pattern-guidance",
+            title: "Pain Pattern Assessment",
+            guidanceType: "questions",
+            recommendations: [
+              "Clarify if pain is constant or intermittent",
+              "Ask about timing patterns (morning, evening, activity-related)",
+              "Document pain triggers and relievers"
+            ],
+            context: "Important to characterize pain pattern for diagnostic workup",
+            priority: "medium"
+          }
+        }
+      },
+      {
+        delay: 3000, // 5 seconds - pain pattern [00:18-00:23]
         component: {
           component: "generic-info",
           params: {
@@ -102,7 +139,26 @@ export default function Demo() {
         }
       },
       {
-        delay: 12000, // 12 seconds - aggravating factors [01:05-01:17]
+        delay: 7000, // 7 seconds - guidance before physical examination (appears before aggravating factors question)
+        component: {
+          component: "clinical-guidance",
+          params: {
+            id: "pre-physical-exam-guidance",
+            title: "Physical Examination Protocol",
+            guidanceType: "examination",
+            recommendations: [
+              "Test range of motion in affected arm",
+              "Assess cervical spine mobility (head turning)",
+              "Check neurological function: strength, reflexes, sensation",
+              "Palpate for tenderness or swelling"
+            ],
+            context: "History taking nearly complete - prepare for systematic physical examination",
+            priority: "high"
+          }
+        }
+      },
+      {
+        delay: 5000, // 5 seconds - aggravating factors [01:05-01:17]
         component: {
           component: "generic-info",
           params: {
@@ -114,7 +170,7 @@ export default function Demo() {
         }
       },
       {
-        delay: 17000, // 17 seconds - physical examination starts [01:18-01:35]
+        delay: 5000, // 17 seconds - physical examination starts [01:18-01:35]
         component: {
           component: "generic-info",
           params: {
@@ -150,7 +206,27 @@ export default function Demo() {
         }
       },
       {
-        delay: 10000, // 10 seconds - medication prescription [01:58-02:07]
+        delay: 5000, // 5 seconds - prescription guidance before medication recommendation
+        component: {
+          component: "clinical-guidance",
+          params: {
+            id: "pre-prescription-guidance",
+            title: "Treatment Prescription Guidance",
+            guidanceType: "procedure",
+            recommendations: [
+              "Consider anti-inflammatory medication for musculoskeletal pain",
+              "High-dose ibuprofen appropriate for acute inflammatory conditions",
+              "Start with conservative treatment before advanced interventions",
+              "Set clear follow-up timeline (1 week) for treatment response",
+              "Advise patient on proper dosing and potential side effects"
+            ],
+            context: "Patient has acute arm pain with normal neurological exam - conservative treatment indicated",
+            priority: "high"
+          }
+        }
+      },
+      {
+        delay: 5000, // 10 seconds - medication prescription [01:58-02:07]
         component: {
           component: "generic-info",
           params: {
@@ -296,7 +372,26 @@ export default function Demo() {
         }
       },
       {
-        delay: 10000, // 10 seconds - doctor's plan [00:21-00:31]
+        delay: 5000, // 5 seconds - guidance before EMG decision
+        component: {
+          component: "clinical-guidance",
+          params: {
+            id: "pre-emg-guidance",
+            title: "Diagnostic Testing Guidance",
+            guidanceType: "assessment",
+            recommendations: [
+              "Consider EMG/NCV testing for persistent neuropathic pain",
+              "Verify insurance coverage before ordering procedure",
+              "Explain test rationale and expectations to patient",
+              "Check for contraindications (blood thinners, pacemaker)"
+            ],
+            context: "Treatment failure at 30 days warrants advanced diagnostic workup",
+            priority: "high"
+          }
+        }
+      },
+      {
+        delay: 5000, // 10 seconds - doctor's plan [00:21-00:31]
         component: {
           component: "generic-info",
           params: {
@@ -308,7 +403,31 @@ export default function Demo() {
         }
       },
       {
-        delay: 17000, // 17 seconds - EMG introduction [00:32-00:48]
+        delay: 3000, // 3 seconds - insurance coverage information
+        component: {
+          component: "insurance-coverage",
+          params: {
+            id: "emg-insurance-coverage",
+            procedureName: "EMG & Nerve Conduction Velocity Testing",
+            icd10Code: "M79.3 (Panniculitis, unspecified)",
+            cptCode: "95860, 95861, 95900-95904",
+            coverageStatus: "covered",
+            patientResponsibility: "Standard copay applies - no deductible",
+            estimatedCost: {
+              total: "$800-1,200",
+              patientPortion: "$50 (copay)"
+            },
+            notes: [
+              "Procedure is medically necessary based on ICD-10 code M79.3",
+              "No prior authorization required for this diagnostic test",
+              "Patient has met criteria: conservative treatment failure >30 days",
+              "Test can be scheduled immediately"
+            ]
+          }
+        }
+      },
+      {
+        delay: 14000, // 14 seconds - EMG introduction [00:32-00:48]
         component: {
           component: "generic-info",
           params: {
