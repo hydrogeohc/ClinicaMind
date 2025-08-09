@@ -2,50 +2,30 @@
 import json
 import sys
 import argparse
+import os
 from typing import Dict, Any
 
-def transcribe_google_cloud(audio_path: str, language: str = "en-US") -> str:
+def transcribe_openai_whisper(audio_path: str, language: str = "en") -> str:
     """
-    Transcribe audio using Google Cloud Speech-to-Text API.
+    Transcribe audio using OpenAI Whisper API.
     """
-    from google.cloud import speech
+    from openai import OpenAI
     
-    client = speech.SpeechClient()
-    
-    with open(audio_path, "rb") as audio_file:
-        content = audio_file.read()
-    
-    audio = speech.RecognitionAudio(content=content)
-    
-    config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=16000,
-        language_code=language,
-        enable_automatic_punctuation=True,
-        enable_word_time_offsets=False,
-        model="latest_long",
-        use_enhanced=True,
-    )
+    # Initialize OpenAI client
+    client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
     
     try:
-        response = client.recognize(config=config, audio=audio)
+        with open(audio_path, "rb") as audio_file:
+            transcript = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file,
+                language=language[:2] if len(language) > 2 else language  # Convert en-US to en
+            )
         
-        transcript_parts = []
-        for result in response.results:
-            transcript_parts.append(result.alternatives[0].transcript)
-        
-        return " ".join(transcript_parts).strip()
+        return transcript.text.strip()
     
     except Exception as e:
-        config.encoding = speech.RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED
-        try:
-            response = client.recognize(config=config, audio=audio)
-            transcript_parts = []
-            for result in response.results:
-                transcript_parts.append(result.alternatives[0].transcript)
-            return " ".join(transcript_parts).strip()
-        except Exception as e2:
-            raise RuntimeError(f"Google Cloud Speech recognition failed: {e2}") from e2
+        raise RuntimeError(f"OpenAI Whisper transcription failed: {str(e)}") from e
 
 class ASRAgent:
     def __init__(self):
@@ -68,7 +48,7 @@ class ASRAgent:
                     "agent": self.name
                 }
             
-            transcript = transcribe_google_cloud(audio_path, language)
+            transcript = transcribe_openai_whisper(audio_path, language)
             
             return {
                 "success": True,

@@ -6,36 +6,26 @@ import tempfile
 import os
 from typing import Dict, Any
 
-def tts_google_cloud(text: str, out_wav: str, language_code: str = "en-US", voice_name: str = "en-US-Neural2-F"):
+def tts_openai(text: str, out_wav: str, voice: str = "alloy"):
     """
-    Generate speech using Google Cloud Text-to-Speech API.
+    Generate speech using OpenAI Text-to-Speech API.
     """
-    from google.cloud import texttospeech
+    from openai import OpenAI
     
-    client = texttospeech.TextToSpeechClient()
+    client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
     
-    synthesis_input = texttospeech.SynthesisInput(text=text)
-    
-    voice = texttospeech.VoiceSelectionParams(
-        language_code=language_code,
-        name=voice_name,
-    )
-    
-    audio_config = texttospeech.AudioConfig(
-        audio_encoding=texttospeech.AudioEncoding.LINEAR16,
-        sample_rate_hertz=24000,
-        speaking_rate=1.0,
-        pitch=0.0,
-    )
-    
-    response = client.synthesize_speech(
-        input=synthesis_input, 
-        voice=voice, 
-        audio_config=audio_config
-    )
-    
-    with open(out_wav, "wb") as out:
-        out.write(response.audio_content)
+    try:
+        response = client.audio.speech.create(
+            model="tts-1",
+            voice=voice,
+            input=text
+        )
+        
+        with open(out_wav, "wb") as f:
+            f.write(response.content)
+            
+    except Exception as e:
+        raise RuntimeError(f"OpenAI TTS failed: {str(e)}") from e
 
 class TTSAgent:
     def __init__(self):
@@ -56,7 +46,21 @@ class TTSAgent:
             text = request.get("text")
             output_path = request.get("output_path")
             language_code = request.get("language_code", "en-US")
-            voice_name = request.get("voice_name", "en-US-Neural2-F")
+            voice_name = request.get("voice_name", "alloy")
+            
+            # Map common voice names to OpenAI voices
+            openai_voices = {
+                "en-US-Neural2-F": "nova",
+                "en-US-Neural2-M": "echo", 
+                "alloy": "alloy",
+                "echo": "echo",
+                "fable": "fable",
+                "onyx": "onyx",
+                "nova": "nova",
+                "shimmer": "shimmer"
+            }
+            
+            openai_voice = openai_voices.get(voice_name, "alloy")
             
             if not text:
                 return {
@@ -68,7 +72,7 @@ class TTSAgent:
             if not output_path:
                 output_path = tempfile.mktemp(suffix=".wav")
             
-            tts_google_cloud(text, output_path, language_code, voice_name)
+            tts_openai(text, output_path, openai_voice)
             
             return {
                 "success": True,
@@ -77,6 +81,7 @@ class TTSAgent:
                 "output_path": output_path,
                 "language_code": language_code,
                 "voice_name": voice_name,
+                "openai_voice": openai_voice,
                 "file_size": os.path.getsize(output_path) if os.path.exists(output_path) else 0
             }
             
