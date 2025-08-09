@@ -1,0 +1,11 @@
+
+# Google Cloud ASR & TTS
+google-cloud-speech>=2.0.0
+google-cloud-texttospeech>=2.0.0
+# Audio I/O
+soundfile>=0.12.1
+numpy>=1.23.0
+# NLP
+regex>=2024.5.15
+# Utilities
+pydub>=0.25.1
