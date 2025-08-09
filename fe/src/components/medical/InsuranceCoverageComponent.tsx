@@ -3,14 +3,14 @@ import { Badge } from "~/components/ui/badge";
 import { Shield, DollarSign, FileText, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import { InsuranceCoverageComponentProps } from "~/types/components";
 
-export function InsuranceCoverageComponent({ 
-  procedureName, 
-  icd10Code, 
-  cptCode, 
-  coverageStatus, 
-  patientResponsibility, 
-  notes, 
-  estimatedCost 
+export function InsuranceCoverageComponent({
+  procedureName,
+  icd10Code,
+  cptCode,
+  coverageStatus,
+  patientResponsibility,
+  notes,
+  estimatedCost
 }: InsuranceCoverageComponentProps) {
   const getStatusIcon = () => {
     switch (coverageStatus) {
@@ -90,7 +90,7 @@ export function InsuranceCoverageComponent({
                 <p className="font-medium">{estimatedCost.total}</p>
               </div>
               <div>
-                <p className="text-muted-foreground">Your Responsibility</p>
+                <p className="text-muted-foreground">Patient Responsibility</p>
                 <p className="font-medium">{estimatedCost.patientPortion}</p>
               </div>
             </div>

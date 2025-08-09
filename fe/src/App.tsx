@@ -291,7 +291,7 @@ export default function Demo() {
               reflexes: "Symmetric reflexes bilaterally",
               strength: {
                 biceps: "Normal, no weakness",
-                triceps: "Normal, no weakness", 
+                triceps: "Normal, no weakness",
                 shoulder: "Normal, no weakness",
                 handGrip: "Normal, no weakness",
                 fingerStrength: "Normal, no weakness"
@@ -587,7 +587,7 @@ export default function Demo() {
                 discomfortLevel: "mild"
               },
               {
-                step: "Electromyography (EMG)", 
+                step: "Electromyography (EMG)",
                 description: "Fine needle insertion into specific muscles (similar to acupuncture) to measure electrical signals",
                 discomfortLevel: "mild"
               }
@@ -653,8 +653,8 @@ export default function Demo() {
         <div className="flex items-center gap-4">
           {/* Conversation Switcher */}
           <div className="flex items-center gap-2">
-            <Button 
-              variant={currentConversation === 1 ? "default" : "outline"} 
+            <Button
+              variant={currentConversation === 1 ? "default" : "outline"}
               size="sm"
               onClick={() => {
                 if (currentConversation !== 1) {
@@ -666,8 +666,8 @@ export default function Demo() {
             >
               First Visit
             </Button>
-            <Button 
-              variant={currentConversation === 2 ? "default" : "outline"} 
+            <Button
+              variant={currentConversation === 2 ? "default" : "outline"}
               size="sm"
               onClick={() => {
                 if (currentConversation !== 2) {
@@ -748,39 +748,6 @@ export default function Demo() {
                         <span>32 / B40</span>
                       </div>
                     </div>
-
-                    <Separator className="my-4" />
-
-                    <div className="space-y-4 text-sm">
-                      <p>
-                        Hematemesis with red clots (large/small no Hematochezia)
-                        for 1 day with Syncope
-                      </p>
-
-                      <div>
-                        <h3 className="font-medium mb-1">
-                          Last Bowel Movement
-                        </h3>
-                        <p className="text-muted-foreground">
-                          6 hr ago, Red blood (Tarry Black/Brown stool)
-                        </p>
-                      </div>
-
-                      <div>
-                        <h3 className="font-medium mb-1">Rectal Exam</h3>
-                        <p className="text-muted-foreground">
-                          Reveals Ongoing red blood (No melena)
-                        </p>
-                      </div>
-
-                      <div>
-                        <h3 className="font-medium mb-1">Prior History</h3>
-                        <p className="text-muted-foreground">
-                          Patient denies prior history CAD, COPD, CRF risk for
-                          stress ulcer, cirrhosis. Patient is on aspirin, PPI
-                        </p>
-                      </div>
-                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -827,7 +794,7 @@ export default function Demo() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="text-center py-12">
-                        <motion.p 
+                        <motion.p
                           className="text-lg font-medium mb-2"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -835,21 +802,13 @@ export default function Demo() {
                         >
                           {currentConversation === 1 ? "David S - First Visit" : "David S - Follow-up Visit (30 days)"}
                         </motion.p>
-                        <motion.p 
-                          className="text-muted-foreground mb-4"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.3 }}
-                        >
-                          Press <kbd className="px-2 py-1 bg-muted rounded text-xs">Space</kbd> to start the conversation demo
-                        </motion.p>
-                        <motion.p 
+                        <motion.p
                           className="text-sm text-muted-foreground"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.4 }}
                         >
-                          {currentConversation === 1 
+                          {currentConversation === 1
                             ? "Initial consultation for left upper arm pain following a fall"
                             : "Follow-up visit after 30 days of treatment - EMG testing ordered"
                           }
