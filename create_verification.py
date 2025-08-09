@@ -7,7 +7,7 @@ verification_request = client.create_domain_verification_request(
     domain="clinical-mind.style.dev"
 )
 
-print("Verification code:", verification_request.verification_code)
+print("Verification code:freestyle-verification-v1-be3eba88-1436-4825-ade8-31f925bded2d", verification_request.verification_code)
 print("Add this DNS record:")
 print("Type: TXT")
 print("Name: _freestyle_custom_hostname.clinical-mind.style.dev")
