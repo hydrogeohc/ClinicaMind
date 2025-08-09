@@ -226,7 +226,7 @@ export default function Demo() {
         }
       },
       {
-        delay: 5000, // 10 seconds - medication prescription [01:58-02:07]
+        delay: 12000, // 12 seconds - medication prescription [01:58-02:07] - appears after doctor finishes speaking
         component: {
           component: "generic-info",
           params: {
@@ -238,7 +238,7 @@ export default function Demo() {
         }
       },
       {
-        delay: 5000, // 5 seconds - summary components
+        delay: 15000, // 15 seconds - summary components start after conversation ends
         component: {
           component: "pain-assessment",
           params: {
@@ -511,7 +511,7 @@ export default function Demo() {
         }
       },
       {
-        delay: 5000, // 5 seconds - summary components start
+        delay: 10000, // 10 seconds - summary components start after conversation ends
         component: {
           component: "pain-assessment",
           params: {
