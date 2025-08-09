@@ -526,9 +526,9 @@ export default function Demo() {
   }, [isPlaying, components.length, startDemo, stopDemo, resetDemo]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen bg-background overflow-hidden">
       {/* Header */}
-      <header className="border-b bg-card px-6 py-4 flex justify-between items-center">
+      <header className="border-b bg-card px-6 py-4 flex justify-between items-center flex-shrink-0">
         <div className="text-2xl font-bold text-blue-600">ClinicaMind</div>
         <div className="flex items-center gap-4">
           {/* Conversation Switcher */}
@@ -571,16 +571,17 @@ export default function Demo() {
       </header>
 
       {/* Main Content - Two Column Grid */}
-      <div className="grid grid-cols-2 h-[calc(100vh-73px)]">
+      <div className="grid grid-cols-2 h-[calc(100vh-73px)] overflow-hidden">
         {/* Left Column - Patient Info */}
-        <div className="p-6 border-r">
-          <div className="mb-6">
-            <div className="flex items-baseline gap-6 mb-4">
-              <h1 className="text-3xl font-bold">Andrey Los</h1>
-              <span className="text-lg text-muted-foreground">
-                Patient 55 / M
-              </span>
-            </div>
+        <div className="border-r overflow-hidden">
+          <div className="h-full overflow-y-auto p-6">
+            <div className="mb-6">
+              <div className="flex items-baseline gap-6 mb-4">
+                <h1 className="text-3xl font-bold">Andrey Los</h1>
+                <span className="text-lg text-muted-foreground">
+                  Patient 55 / M
+                </span>
+              </div>
 
             <Tabs defaultValue="overview" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
@@ -684,13 +685,14 @@ export default function Demo() {
                 </Card>
               </TabsContent>
             </Tabs>
+            </div>
           </div>
         </div>
 
         {/* Right Column - Dynamic Scrollable Content */}
-        <div className="bg-muted/30">
-          <ScrollArea className="h-full">
-            <div className="p-6">
+        <div className="bg-muted/30 h-full overflow-hidden">
+          <ScrollArea className="h-[calc(100vh-73px)]">
+            <div className="p-6 min-h-full">
               {components.length > 0 ? (
                 <DynamicComponentRenderer components={components} />
               ) : (

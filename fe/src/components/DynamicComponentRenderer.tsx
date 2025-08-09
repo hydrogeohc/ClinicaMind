@@ -94,7 +94,7 @@ export function DynamicComponentRenderer({ components }: ComponentRendererProps)
 
   return (
     <div className="space-y-6">
-      {components.map((component, index) => renderComponent(component, index))}
+      {components.slice().reverse().map((component, index) => renderComponent(component, components.length - 1 - index))}
     </div>
   );
 }
