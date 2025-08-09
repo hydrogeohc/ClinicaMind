@@ -121,13 +121,42 @@ class PainOrchestrator:
         
         transcript = asr_result["transcript"]
         
-        # Step 2: Pain NLP Processing
+        # Step 2: Security & Ethics Input Validation
+        security_request = {
+            "mode": "input_validation",
+            "text": transcript
+        }
+        
+        security_result = self.call_agent("security_ethics_agent.py", security_request)
+        pipeline_result["steps"]["security_input"] = security_result
+        
+        if not security_result.get("success"):
+            pipeline_result["final_result"] = {
+                "success": False,
+                "error": "Security validation failed",
+                "details": security_result
+            }
+            return pipeline_result
+        
+        # Check if input validation passed
+        if security_result.get("overall_status", {}).get("blocking_issues"):
+            pipeline_result["final_result"] = {
+                "success": False,
+                "error": "Input contains security issues that block processing",
+                "details": security_result
+            }
+            return pipeline_result
+        
+        # Use redacted text for processing if needed
+        processed_transcript = security_result.get("input_validation", {}).get("redacted_text", transcript)
+        
+        # Step 3: Pain NLP Processing
         try:
-            pain_score, severity_bucket = estimate_pain_from_text(transcript)
+            pain_score, severity_bucket = estimate_pain_from_text(processed_transcript)
             nlp_result = {
                 "success": True,
                 "agent": "pain_nlp",
-                "transcript": transcript,
+                "transcript": processed_transcript,
                 "pain_nrs": pain_score,
                 "severity": severity_bucket
             }
@@ -148,7 +177,26 @@ class PainOrchestrator:
             }
             return pipeline_result
         
-        # Step 3: TTS Agent (optional)
+        # Step 4: Security & Ethics Assessment Validation
+        ethics_request = {
+            "mode": "assessment_validation",
+            "pain_score": pain_score,
+            "severity": severity_bucket,
+            "transcript": processed_transcript
+        }
+        
+        ethics_result = self.call_agent("security_ethics_agent.py", ethics_request)
+        pipeline_result["steps"]["security_ethics"] = ethics_result
+        
+        if not ethics_result.get("success"):
+            pipeline_result["final_result"] = {
+                "success": False,
+                "error": "Ethics validation failed",
+                "details": ethics_result
+            }
+            return pipeline_result
+        
+        # Step 5: TTS Agent (optional)
         tts_text = f"The estimated arm pain is {pain_score:.1f} out of ten, which is {severity_bucket}."
         
         if output_audio:
@@ -168,11 +216,15 @@ class PainOrchestrator:
         pipeline_result["final_result"] = {
             "success": True,
             "audio_input": audio_path,
-            "transcript": transcript,
+            "transcript": processed_transcript,
+            "original_transcript": transcript,
             "pain_nrs": pain_score,
             "severity": severity_bucket,
             "assessment_text": tts_text,
-            "output_audio": output_audio if output_audio else None
+            "output_audio": output_audio if output_audio else None,
+            "security_status": security_result.get("overall_status", {}),
+            "ethics_recommendations": ethics_result.get("ethics_validation", {}).get("recommendations", []),
+            "requires_review": ethics_result.get("overall_status", {}).get("requires_review", False)
         }
         
         return pipeline_result
