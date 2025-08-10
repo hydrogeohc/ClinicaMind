@@ -1,4 +1,4 @@
-# ClinicaMind
+# ClinicaMind - Exploring Hybrid UX for Conversational AI
 
 A comprehensive medical clinic management platform combining AI-powered conversation analysis with a modern web interface for clinical workflows.
 
